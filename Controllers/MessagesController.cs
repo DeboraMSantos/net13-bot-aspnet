@@ -16,6 +16,7 @@ namespace SimpleBot
         {
             if ( activity != null && activity.Type == ActivityTypes.Message)
             {
+                var a = "";
                 await HandleActivityAsync(activity);
             }
 

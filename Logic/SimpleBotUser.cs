@@ -39,28 +39,32 @@ namespace SimpleBot
 
         public static UserProfile GetProfile(string id)
         {
-            //MongoClient client = new MongoClient("mongodb://localhost:27017");
-            //IMongoDatabase db = client.GetDatabase("db01");
-            //IMongoCollection<BsonDocument> col = db.GetCollection<BsonDocument>("tabela01");
-            //var filter = Builders<BsonDocument>.Filter.Eq("id", id);
-            //var a = col.Find(filter).ToList();
-
-            //UserProfile userProfile = new UserProfile()
-            //{
-            //    Id = id,
-            //    Visitas = a.Count()
-            //};             
-
-            //return userProfile;
+            MongoClient client = new MongoClient("mongodb://localhost:27017");
+            IMongoDatabase db = client.GetDatabase("db01");
+            IMongoCollection<BsonDocument> col = db.GetCollection<BsonDocument>("tabela01");
+            var filter = Builders<BsonDocument>.Filter.Eq("id", id);
+            var a = col.Find(filter).ToList();
 
             _dictProfiles.TryGetValue(id, out var profile);
 
             if(profile == null)
             {
-
+               return new UserProfile()
+               {
+                   Id = id,
+                   Visitas = 0
+               };
             }
+            return new UserProfile()
+            {
+                Id = id,
+                Visitas = a.Count()
+            };
+
         }
-        public static void SalvarHistorico(Message message) { }
+        public static void SalvarHistorico(Message message)
+        {
+        }
 
         public static void SetProfile(string id, UserProfile profile)
         {
@@ -75,13 +79,13 @@ namespace SimpleBot
                 {"app", "testeBot"}
             };
 
-            if (profile.Visitas > 100)
+            if (profile.Visitas == 0)
             {
-                col.UpdateOne(filter,doc);
+                col.InsertOne(doc);
             }
             else
             {
-                col.InsertOne(doc);
+                col.UpdateOne(filter, doc);         
             }
 
         }
